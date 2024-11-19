@@ -1,8 +1,8 @@
 #ifndef __SIMPLETIMERWP_H_
 #define __SIMPLETIMERWP_H_  //Protection from the headers are getting included multiple time
-//#ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-	//#endif // !_cplusplus
+#endif // !_cplusplus
 
 #include <stdint.h>
 #include <string.h> //only for memset
@@ -116,8 +116,8 @@ uint8_t getRegisterTimersMaxIndex(void);
 void TaskYieldWithinSpecifiedTime(const uint32_t time, Timert_t* Timer);
 #endif
 
-//#ifdef __cplusplus
+#ifdef __cplusplus
 }
-//#endif // !_cplusplus
+#endif // !_cplusplus
 
 #endif // !__SIMPLETIMER_H_

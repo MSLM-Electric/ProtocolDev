@@ -18,7 +18,9 @@ typedef volatile signed short vs16;
 typedef volatile signed char vs8;
 typedef volatile signed char vi8;
 
+#if !defined(__XC8) && (__SIZEOF_LONG_LONG__ == 8)
 typedef uint64_t u64;
+#endif // ! not __XC8
 typedef unsigned long int u32;
 typedef unsigned int ui32;//for get rid of warning messege
 typedef unsigned short u16;
@@ -66,6 +68,10 @@ typedef u32 u32_t;
 #define NOTHING 0 //!just for beautyfying and readability code
 #endif // !NOTHING
 
+#ifndef NULL
+#define NULL (void *)0
+#endif
+
 #ifndef SOMETHING 
 #ifdef NULL
 #define SOMETHING ~NULL
@@ -80,7 +86,7 @@ typedef u32 u32_t;
 #define clearBITS(x) &= ~(u32)(x)
 #define setBITS(x) |= (x)
 //#define BITPOS(x) y = while((x >> 1) > 1){y++};
-#define asm __asm
+//#define asm __asm
 //u16 BitPos(u16 Bit);
 //u16 BitPos(u16 Bit)
 //{
@@ -152,7 +158,7 @@ inline char* CUT_FILES_PATH(char* x, int siz) {
 #define FUNCTION_EXECUTE_PRINT(x)
 #endif // !(FUNCTION_EXECUTE_PRINT_EN )
 
-#define asm __asm
+//#define asm __asm
 
 //#if defined(_MSC_VER)
 //#define DLL_PUBLIC __declspec(dllexport) // Note: actually gcc seems to also supports this syntax.

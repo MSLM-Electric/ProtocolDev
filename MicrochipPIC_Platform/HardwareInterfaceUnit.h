@@ -1,13 +1,13 @@
 #ifndef HARDWARE_INTERFACE_UNIT_H
 #define HARDWARE_INTERFACE_UNIT_H
-//#ifdef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-//#endif // !_cplusplus
+#endif // !_cplusplus
 #include <stdint.h>
 #include "type_def.h"
 //#include "../../Lib/fileHandle.h"
 //#include "../SimpleTimer/SimpleTimerWP.h"
-#include "../SimpleTimer/SimpleTimerWP.h"
+#include "SimpleTimerWP.h"
 #include "MasterImmitationCfg.h"
 #include "SlaveImmitationCfg.h"
 
@@ -151,8 +151,8 @@ void tracePort(InterfacePortHandle_t* Port, tracePortCfg_t* traceP);
 void ShowTracedAccumulations(tracePortCfg_t* traceP);
 u16 BitPos(u16 Bit);
 
-//#ifdef __cplusplus
+#ifdef __cplusplus
 }
-//#endif // !_cplusplus
+#endif // !_cplusplus
 
 #endif // !HARDWARE_INTERFACE_UNIT_H

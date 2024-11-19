@@ -35,6 +35,8 @@ static uint32_t getTickValue(void);
 InterfacePortHandle_t SlavePort;
 Timert_t Timer1s;
 Timert_t Timer10ms;
+uint8_t txBuffer;
+uint8_t rxBuffer;
 
 static uint32_t getTickValue()
 {
@@ -49,10 +51,10 @@ void __interrupt() ISR(void)
         someExternalTick++;
         TMR1IF = 0;   // Clear The Flag Bit !
     }
-    if (ADCIF == 1)  // Check The Flag
+    if (ADIF == 1)  // Check The Flag
     {
         // Do ADC handling
-        ADCIF = 0;    // Clear The Flag Bit !
+        ADIF = 0;    // Clear The Flag Bit !
     }
     /*    if (RCIF == 1)
         {
@@ -110,7 +112,7 @@ void main(void* arg)
     LaunchTimerWP(1000, &Timer1s);
     InitTimerWP(&Timer10ms, NULL);
     LaunchTimerWP((U32_ms)10, &Timer10ms);
-
+    char buffer[RECV_BUFFER_SIZE];
     while (1)
     {
         // Sending data
