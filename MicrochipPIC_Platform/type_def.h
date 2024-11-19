@@ -69,7 +69,7 @@ typedef u32 u32_t;
 #endif // !NOTHING
 
 #ifndef NULL
-#define NULL (void *)0
+#define NULL ((void *)0)
 #endif
 
 #ifndef SOMETHING 
