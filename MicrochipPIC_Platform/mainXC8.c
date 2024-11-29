@@ -140,12 +140,13 @@ void main(void* arg)
 
         if (IsTimerWPRinging(&Timer10ms)) {
             RestartTimerWP(&Timer10ms);
+            if ((SlavePort.Status & (PORT_BUSY | PORT_SENDING)) == NOTHING) {
+                memset(SlavePort.BufferRecved, 0, sizeof(SlavePort.BufferRecved));
+                Recv(&SlavePort, buffer, sizeof(buffer));
+            }
             if(IsTimerWPRinging(&Timer1s)){
                 RestartTimerWP(&Timer1s);
-                if ((SlavePort.Status & (PORT_BUSY | PORT_SENDING)) == NOTHING) {
-                    memset(SlavePort.BufferRecved, 0, sizeof(SlavePort.BufferRecved));
-                    Recv(&SlavePort, buffer, sizeof(buffer));
-                }
+
                 //UART_SendChar('A');
                 //UART_SendChar(UART_GetChar());
             }

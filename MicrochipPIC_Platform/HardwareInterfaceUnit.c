@@ -45,8 +45,8 @@ static int InitPort(InterfacePortHandle_t* PortHandle)
 	InitTimerWP(&PortHandle->SendingTimer, NULL);
 #endif // !MINIMAL_CODESIZE
 	PortHandle->Status = 0;
-	PortHandle->ReceivingTimer.setVal = (U32_ms)100; //Default 200ms
-	PortHandle->SendingTimer.setVal = (U32_ms)1000; //def
+	PortHandle->ReceivingTimer.setVal = (U32_ms)50;
+	PortHandle->SendingTimer.setVal = (U32_ms)400;
 	return res;
 }
 
