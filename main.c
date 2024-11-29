@@ -285,6 +285,7 @@ void vSlaveCoreImmit(void* pvParameters)
 			Recv(&SlavePort, buffer, sizeof(buffer));
 		}
 		ReceivingTimerHandle(&SlavePort);
+		SendingTimerHandle(&SlavePort); //!?
 		if (SlavePort.Status & PORT_RECEIVED_ALL) {
 			DEBUG_PRINTM(1, SlavePort.BufferRecved);
 			Write(&SlavePort, "Slave've got your msg!\n", 24);
