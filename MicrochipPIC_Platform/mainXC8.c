@@ -27,7 +27,11 @@
 
 #include <xc.h>
 #include <stdint.h>
+
+#define DISABLE_LOGS
+
 #include "SimpleTimerWP.h"
+#include "usart.h"
 #include "HardwareInterfaceUnit.h"
 
 extern uint32_t someExternalTick;
@@ -45,12 +49,16 @@ static uint32_t getTickValue()
 
 void __interrupt() ISR(void)
 {
-    if (TMR1IF == 1) // Check The Flag
+    if (TMR2IF == 1) // Check The Flag
     {
         // Do Timer handling
         someExternalTick++;
-        TMR1IF = 0;   // Clear The Flag Bit !
-    }
+        TMR2IF = 0;   // Clear The Flag Bit !
+        if ((SlavePort.Status & (PORT_READY | PORT_SENDING /*| PORT_BUSY*/)) == ONLY (PORT_READY | PORT_SENDING /*| PORT_BUSY*/)) {
+            SlavePort.Status |= PORT_SENDED;
+            Write(&SlavePort, NULL, no_required_now);
+        }
+	}
     if (ADIF == 1)  // Check The Flag
     {
         // Do ADC handling
@@ -67,52 +75,61 @@ void __interrupt() ISR(void)
             TXIF = 0;
         }
     */
-    if (PIR1bits.TXIF && PIE1bits.TXIE)  // Interrupt for data transmission
-    {
-        TXREG = txBuffer;  // Transmit data from the buffer
-        PIE1bits.TXIE = 0;  // Disable transmission interrupt
+    //if (PIR1bits.TXIF/*is almost 1 any time //!?*/ && PIE1bits.TXIE)  // Interrupt for data transmission
+    //{
+        //TransmitInterrupt(&SlavePort);
+    //}
+    if(RCSTAbits.FERR){
+        //rx framing error
+        SPEN = 0;
+        SPEN = 1;
     }
-
-    if (PIR1bits.RCIF && PIE1bits.RCIE)  // Interrupt for data reception
+    if(RCSTAbits.OERR){
+        //rx overrun error!
+        RCSTAbits.CREN = 0;
+        RCSTAbits.CREN = 1;
+    }
+    
+    if (PIR1bits.RCIF)  // Interrupt for data reception
     {
-        rxBuffer = RCREG;  // Read received data
-        // Do something with the received data...
+        ReceiveInterrupt(&SlavePort);
     }
 }
 
-void UART_Init()
+void Timer2_to_1ms_interrupt_init()
 {
-    TRISCbits.TRISC6 = 0;  // TX as output
-    TRISCbits.TRISC7 = 1;  // RX as input
+    /* Fcycle = 4MHz/4 = 1Mhz */
+    /* Fcycle/(Tckps[2LSB:0b01]) = 1MHz/4 = 250kHz */
+    /* 250kHz --> |every 250 TMR2 cnt| = 1000Hz */
+    T2CON = 0b00000000 | 0x01;
+    PR2 = 250;
+    TMR2ON = 0;
+    PIR1bits.TMR2IF = 0;
+    PIE1bits.TMR2IE = 1;
+    TMR2ON = 1;
+}
 
-    SPBRG = 51;  // For 9600 baud rate
-
-    TXSTAbits.SYNC = 0;  // Asynchronous transmission
-    RCSTAbits.SPEN = 1;  // Enable UART
-    TXSTAbits.TXEN = 1;  // Enable transmitter
-    RCSTAbits.CREN = 1;  // Enable receiver
-    PIE1bits.RCIE = 1;   // Enable receive interrupt
+void GlobalMCUINT_init()
+{
     INTCONbits.PEIE = 1; // Enable peripheral interrupts
     INTCONbits.GIE = 1;  // Global interrupt enable
 }
 
-void UART_SendChar(char data)
-{
-    while (PIE1bits.TXIE);  // Wait until the transmission buffer is empty
-    txBuffer = data;       // Place data in the buffer
-    PIE1bits.TXIE = 1;     // Enable transmission interrupt
-}
-
 void main(void* arg)
-{
-    UART_Init();
-    InitSlavePort(&SlavePort);
-    SlavePort.Status setBITS(PORT_READY);
+{        
+    Timer2_to_1ms_interrupt_init();
     InitTimerWP(&Timer1s, NULL);
     LaunchTimerWP(1000, &Timer1s);
     InitTimerWP(&Timer10ms, NULL);
     LaunchTimerWP((U32_ms)10, &Timer10ms);
     char buffer[RECV_BUFFER_SIZE];
+    //char storedBuffer[RECV_BUFFER_SIZE];
+    UART_Init();
+    InitSlavePort(&SlavePort);
+    SlavePort.Status setBITS(PORT_READY);
+    GlobalMCUINT_init();
+    while(NOT IsTimerWPRinging(&Timer1s));
+    RestartTimerWP(&Timer1s);
     while (1)
     {
         // Sending data
@@ -123,14 +140,22 @@ void main(void* arg)
 
         if (IsTimerWPRinging(&Timer10ms)) {
             RestartTimerWP(&Timer10ms);
-            if (NOT(SlavePort.Status & PORT_BUSY)) {
-                memset(SlavePort.BufferRecved, 0, sizeof(SlavePort.BufferRecved));
-                Recv(&SlavePort, buffer, sizeof(buffer));
+            if(IsTimerWPRinging(&Timer1s)){
+                RestartTimerWP(&Timer1s);
+                if ((SlavePort.Status & (PORT_BUSY | PORT_SENDING)) == NOTHING) {
+                    memset(SlavePort.BufferRecved, 0, sizeof(SlavePort.BufferRecved));
+                    Recv(&SlavePort, buffer, sizeof(buffer));
+                }
+                //UART_SendChar('A');
+                //UART_SendChar(UART_GetChar());
             }
             ReceivingTimerHandle(&SlavePort);
+            SendingTimerHandle(&SlavePort);
             if (SlavePort.Status & PORT_RECEIVED_ALL) {
                 //DEBUG_PRINTM(1, SlavePort.BufferRecved);
-                Write(&SlavePort, "Slave've got your msg!\n", 24);
+                //Write(&SlavePort, "Slave've got your msg!\n", 24);
+                //memcpy(buffer, storedBuffer, sizeof(storedBuffer));
+                Write(&SlavePort, SlavePort.BufferRecved, RECV_BUFFER_SIZE);
             }
         }
     }

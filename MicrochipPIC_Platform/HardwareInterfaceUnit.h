@@ -8,8 +8,8 @@ extern "C" {
 //#include "../../Lib/fileHandle.h"
 //#include "../SimpleTimer/SimpleTimerWP.h"
 #include "SimpleTimerWP.h"
-#include "MasterImmitationCfg.h"
-#include "SlaveImmitationCfg.h"
+//#include "MasterImmitationCfg.h"
+//#include "SlaveImmitationCfg.h"
 
 #ifdef DEBUG_ON_VS
 HANDLE HardwareImmitMutex; //on real hardware mutex not needed

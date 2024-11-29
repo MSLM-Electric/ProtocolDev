@@ -147,7 +147,7 @@ inline char* CUT_FILES_PATH(char* x, int siz) {
 #endif
 #define CUT_TEST LINE_EXECUTE_PRINT*/
 
-#define FUNCTION_EXECUTE_PRINT_EN 1
+#define FUNCTION_EXECUTE_PRINT_EN 0
 #if (FUNCTION_EXECUTE_PRINT_EN )//&& defined (__func__)) //or __FUNCTION__
 #define FUNCTION_EXECUTE_PRINT(x) do{\
                             if(x)\
