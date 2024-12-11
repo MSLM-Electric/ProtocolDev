@@ -228,7 +228,7 @@ void vMasterCoreImmit( void *pvParameters )
 	volatile uint32_t ul;
 	static char buffer[200];
 	u32 testVar = 0;
-	const char msg[] = "Assalamu aleykum RAFIQ - \0\0\0\0\0\0\0\0\0\0\n";
+	const char msg[] = "help\0lamu aleykum RAFIQ - \0\0\0\0\0\0\0\0\0\0\n";
 	u8 putNumPos = 25;
 
 	InitMasterPort(&MasterPort);
