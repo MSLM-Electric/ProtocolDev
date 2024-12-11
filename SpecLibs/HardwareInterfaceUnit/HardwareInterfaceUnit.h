@@ -2,11 +2,12 @@
 #define HARDWARE_INTERFACE_UNIT_H
 #include <stdint.h>
 #include "../../../../ExternalLibs/type_def.h"
-//#include "../../Lib/fileHandle.h"
-//#include "../SimpleTimer/SimpleTimerWP.h"
 #include "../SpecLibs/SimpleTimerWP.h"
 #include "MasterImmitationCfg.h"
 #include "SlaveImmitationCfg.h"
+
+#define RECV_BUFF_SIZE 255
+#define SEND_BUFF_SIZE 255
 
 #ifdef DEBUG_ON_VS
 HANDLE HardwareImmitMutex; //on real hardware mutex not needed
@@ -84,8 +85,8 @@ typedef Timert_t Timerwp_t;
 
 
 typedef struct {
-	uint8_t BufferRecved[255];
-	uint8_t BufferToSend[255];
+	uint8_t BufferRecved[RECV_BUFF_SIZE];
+	uint8_t BufferToSend[SEND_BUFF_SIZE];
 	uint16_t LenDataToSend;
 	uint16_t LenDataToRecv; //mb maxPossibleDataRecv
 	Timerwp_t ReceivingTimer;     //for port timeout

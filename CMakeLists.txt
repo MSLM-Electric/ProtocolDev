@@ -22,6 +22,7 @@ set(FREERTOS_SUPPORT_FUNCS "${ROOT_PATH}/${BACK_FROM_ROOT}/Win32-simulator-MSVC/
 set(EXTERNAL_LIBS "${ROOT_PATH}/${BACK_FROM_ROOT}/ExternalLibs")
 set(BITLOGGER ${EXTERNAL_LIBS}/BitLogger)
 set(SIMPLETIMER SpecLibs)
+set(CONSOLEMENUOPTSPATH SpecLibs)
 set(HARDWAREINTERFACE_UNIT ${ROOT_PATH}/SpecLibs/HardwareInterfaceUnit)
 #set(CMSIS_OS_ENABLE_FLAG FALSE) #disable this flag if you don't want use cmsis on current project
 if(CMSIS_OS_ENABLE_FLAG)
@@ -44,6 +45,7 @@ set(SOURCES
     ${BITLOGGER}/BitLogger.c
     ${SIMPLETIMER}/SimpleTimerWP.c
     ${HARDWAREINTERFACE_UNIT}/HardwareInterfaceUnit.c
+    ${CONSOLEMENUOPTSPATH}/ConsoleMenuOptions.c
     ${ROOT_PATH}/main.c
 
     ${ROOT_PATH}/MicrochipPIC_Platform/portXC8.c
@@ -69,6 +71,7 @@ set(HEADERS
     ${FREERTOS_SUPPORT_FUNCS}/supporting_functions.h
     ${ROOT_PATH}/FreeRTOSConfig.h
     ${ROOT_PATH}/debug_print.h
+    ${CONSOLEMENUOPTSPATH}/ConsoleMenuOptions.h
 
     ${EXTERNAL_LIBS}/type_def.h
     ${BITLOGGER}/BitLogger.h

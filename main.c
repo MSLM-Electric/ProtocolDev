@@ -130,6 +130,11 @@ TaskHandle_t xSlaveTXsignal;
 #define PRINT_BACKGROUND_PROCESS(e, s)
 #endif // ENABLE_PRINTING_BACKGROUND_PROCESS
 
+#include "SpecLibs/ConsoleMenuOptions.h"
+static void RegisterCmdFunctionsCallback(void);
+void ShowHelpInfo(char* buf, const int bufflen, void* arg);
+void SetDefaultConfig(char* buf, const int bufflen, void* arg);
+void ResetPortsState(char* buf, const int bufflen, void* arg);
 /*-----------------------------------------------------------*/
 
 /*-----------------------------------------------------------*/
@@ -223,7 +228,7 @@ void vMasterCoreImmit( void *pvParameters )
 	volatile uint32_t ul;
 	static char buffer[200];
 	u32 testVar = 0;
-	const char msg[] = "Assalamu aleykum RAFIQ - \0\0\0\0\0\0\0\0\0\0\n";
+	const char msg[] = "help\0lamu aleykum RAFIQ - \0\0\0\0\0\0\0\0\0\0\n";
 	u8 putNumPos = 25;
 
 	InitMasterPort(&MasterPort);
@@ -233,7 +238,6 @@ void vMasterCoreImmit( void *pvParameters )
 	Timert_t CommunPeriod;
 	InitTimerWP(&CommunPeriod, NULL);
 	LaunchTimerWP(MasterPort.communicationPeriod, &CommunPeriod);
-	//sprintf(MasterPort.BufferToSend, "Assalamu aleykum RAFIQ!\n");
 	/* As per most tasks, this task is implemented in an infinite loop. */
 	for( ;; )
 	{
@@ -272,6 +276,7 @@ void vSlaveCoreImmit(void* pvParameters)
 
 	InitSlavePort(&SlavePort);
 	SlavePort.Status setBITS(PORT_READY);
+	RegisterCmdFunctionsCallback();
 	/* As per most tasks, this task is implemented in an infinite loop. */
 	for (;; )
 	{
@@ -287,6 +292,8 @@ void vSlaveCoreImmit(void* pvParameters)
 		ReceivingTimerHandle(&SlavePort);
 		SendingTimerHandle(&SlavePort); //!?
 		if (SlavePort.Status & PORT_RECEIVED_ALL) {
+			ConsoleCMDsParse(SlavePort.BufferRecved, RECV_BUFF_SIZE);
+			ExecuteCMDsScenarios(SlavePort.BufferToSend, SEND_BUFF_SIZE);
 			DEBUG_PRINTM(1, SlavePort.BufferRecved);
 			Write(&SlavePort, "Slave've got your msg!\n", 24);
 		}
@@ -389,6 +396,21 @@ static uint32_t waitRXingFromSlaveByMaster(void)
 }
 
 /*-----------------------------------------------------------*/
+
+static void RegisterCmdFunctionsCallback(void)
+{
+	ConsolesMenuHandle.executeFunc[HELP] = (callback_fn*)ShowHelpInfo;
+	ConsolesMenuHandle.executeFunc[DEFAULT_CONFIGS] = (callback_fn*)SetDefaultConfig;
+	ConsolesMenuHandle.executeFunc[RESET_PORT] = (callback_fn*)ResetPortsState;
+}
+
+void ShowHelpInfo(char* buf, const int bufflen, void* arg)
+{
+	return;
+}
+
+void SetDefaultConfig(char* buf, const int bufflen, void* arg) {}
+void ResetPortsState(char* buf, const int bufflen, void* arg) {}
 
 static uint32_t ulExampleInterruptHandler(void)
 {
